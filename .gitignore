@@ -24,7 +24,7 @@ hs_err_pid*
 
 *.iml
 .gradle
-/local.properties
+local.properties
 /.idea
 /tempMergeFolder
 .DS_Store
