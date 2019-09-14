@@ -81,7 +81,7 @@ public class Drivetrain {
 			ny = Math.signum(y) * m;
 		}
 
-		setPower(ny - nx + turn, y + x - turn, y + x + turn, y - x - turn);
+		setPower(ny - nx + turn, ny + nx - turn, ny + nx + turn, ny - nx - turn);
 	}
 
 	/**
