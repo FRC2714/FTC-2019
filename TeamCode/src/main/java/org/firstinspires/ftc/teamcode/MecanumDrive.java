@@ -1,46 +1,26 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-public class MecanumDrive {
+@TeleOp(name = "Mecanum Drive", group = "Prototype")
+public class MecanumDrive extends OpMode {
 
-	final String[] wheelNames = { "FrontL", "FrontR", "BackL", "BackR" };
+	final static double DEADZONE = 0.01;
+	Drivetrain drivetrain;
 
-	public static boolean useEncoders = false;
-
-	private MecanumDrive mecanumDrive;
-
-	private HardwareMap hardwareMap;
-
-	private DcMotor[] wheels;
-
-	public MecanumDrive getInstance(HardwareMap hm) {
-		if (mecanumDrive == null) mecanumDrive = new MecanumDrive(hm);
-		return mecanumDrive;
+	@Override
+	public void init() {
+		drivetrain = Drivetrain.getInstance(hardwareMap);
 	}
 
-	private MecanumDrive(HardwareMap hm) {
-		hardwareMap = hm;
-
-		wheels = new DcMotor[wheelNames.length];
-
-		for (int i = 0; i < wheelNames.length; i++) {
-			wheels[i] = hardwareMap.dcMotor.get(wheelNames[i]);
-			wheels[i].setPower(0);
-			wheels[i].setMode(useEncoders ? DcMotor.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+	@Override
+	public void loop() {
+		double x = gamepad1.left_stick_x,
+				y = gamepad1.left_stick_y,
+				turn = gamepad1.right_stick_x;
+		if (x * x + y * y > DEADZONE || Math.abs(turn) > DEADZONE) {
+			drivetrain.setDirectionVector(x, y, turn);
 		}
-	}
-
-	public void setPower(double fl, double fr, double bl, double br) {
-		wheels[0].setPower(fl);
-		wheels[1].setPower(fr);
-		wheels[2].setPower(bl);
-		wheels[3].setPower(br);
-	}
-
-	public void setDirectionVector(double x, double y, double turn) {
-
 	}
 }

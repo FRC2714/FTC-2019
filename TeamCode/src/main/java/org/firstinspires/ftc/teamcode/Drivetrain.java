@@ -1,0 +1,97 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+public class Drivetrain {
+
+	final String[] wheelNames = { "FrontL", "FrontR", "BackL", "BackR" };
+
+	private static Drivetrain mecanumDrive;
+
+	private HardwareMap hardwareMap;
+
+	private DcMotor[] wheels;
+
+	/**
+	 * Ensures that only one instance of `Drivetrain` exists and that it
+	 * is used globally
+	 * @param hm Hardware map provided by `OpMode` class
+	 * @return universal mecanum drivetrain
+	 */
+	public static Drivetrain getInstance(HardwareMap hm) {
+		if (mecanumDrive == null) mecanumDrive = new Drivetrain(hm);
+		return mecanumDrive;
+	}
+
+	private Drivetrain(HardwareMap hm) {
+		hardwareMap = hm;
+
+		wheels = new DcMotor[wheelNames.length];
+
+		for (int i = 0; i < wheelNames.length; i++) {
+			wheels[i] = hardwareMap.dcMotor.get(wheelNames[i]);
+			wheels[i].setPower(0);
+		}
+	}
+
+	/**
+	 * Set the encoder mode of each motor
+	 * @param useEncoders whether or not to allow encoder use
+	 */
+	public void setUseEncoders(boolean useEncoders) {
+		for (int i = 0; i < wheelNames.length; i++) {
+			wheels[i].setMode(useEncoders ? DcMotor.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+		}
+	}
+
+	/**
+	 * Sets the powers of each wheel
+	 * @param fl front-left motor
+	 * @param fr front-right motor
+	 * @param bl back-left motor
+	 * @param br back-right motor
+	 */
+	public void setPower(double fl, double fr, double bl, double br) {
+		wheels[0].setPower(clamp(fl, -1, 1));
+		wheels[1].setPower(clamp(fr, -1, 1));
+		wheels[2].setPower(clamp(bl, -1, 1));
+		wheels[3].setPower(clamp(br, -1, 1));
+	}
+
+	/**
+	 * Sets the robot on a course headed in the direction of vector
+	 * (x, y) relative to its current orientation with the option to
+	 * simultaneously turn
+	 * @param x lateral movement
+	 * @param y forward movement
+	 * @param turn rotation amount
+	 */
+	public void setDirectionVector(double x, double y, double turn) {
+		double m = Math.sqrt(x * x + y * y);
+		double nx, ny;
+
+		// De-normalize vector (x,y) into square space
+		if (Math.abs(x) > Math.abs(y)) {
+			nx = Math.signum(x) * m;
+			ny = Math.signum(x) * y / x * m;
+		} else {
+			nx = Math.signum(y) * x / y * m;
+			ny = Math.signum(y) * m;
+		}
+
+		setPower(ny - nx + turn, y + x - turn, y + x + turn, y - x - turn);
+	}
+
+	/**
+	 * Restricts a number within the interval [min, max]
+	 * @param num input number
+	 * @param min range minimum
+	 * @param max range maximum
+	 * @return constrained number
+	 */
+	private double clamp(double num, double min, double max) {
+		return Math.min(Math.max(num, min), max);
+	}
+}
