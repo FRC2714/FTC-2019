@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Drivetrain {
 
-	final String[] wheelNames = { "FrontL", "FrontR", "BackL", "BackR" };
+	final String[] wheelNames = { "left_front", "left_back", "right_front", "right_black" };
 
 	private static Drivetrain mecanumDrive;
 
@@ -22,7 +22,7 @@ public class Drivetrain {
 	 */
 	public static Drivetrain getInstance(HardwareMap hm) {
 		if (mecanumDrive == null) mecanumDrive = new Drivetrain(hm);
-		return mecanumDrive;
+			return mecanumDrive;
 	}
 
 	private Drivetrain(HardwareMap hm) {
