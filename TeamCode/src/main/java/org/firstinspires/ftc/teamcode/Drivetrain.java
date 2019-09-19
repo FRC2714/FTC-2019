@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 public class Drivetrain {
 
-	final String[] wheelNames = { "left_front", "left_back", "right_front", "right_black" };
+	final String[] wheelNames = { "left_front", "left_back", "right_front", "right_back" };
 
 	private static Drivetrain mecanumDrive;
 
@@ -34,6 +36,9 @@ public class Drivetrain {
 			wheels[i] = hardwareMap.dcMotor.get(wheelNames[i]);
 			wheels[i].setPower(0);
 		}
+
+		wheels[2].setDirection(DcMotorSimple.Direction.REVERSE);
+		wheels[3].setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 
 	/**
@@ -73,15 +78,28 @@ public class Drivetrain {
 		double nx, ny;
 
 		// De-normalize vector (x,y) into square space
-		if (Math.abs(x) > Math.abs(y)) {
+		if (x == 0 || y == 0) {
+			nx = x;
+			ny = y;
+		} else if (Math.abs(x) > Math.abs(y)) {
 			nx = Math.signum(x) * m;
 			ny = Math.signum(x) * y / x * m;
 		} else {
 			nx = Math.signum(y) * x / y * m;
 			ny = Math.signum(y) * m;
 		}
+		setPower(ny - nx - turn, ny + nx - turn, ny + nx + turn, ny - nx + turn);
+	}
 
-		setPower(ny - nx + turn, ny + nx - turn, ny + nx + turn, ny - nx - turn);
+	/**
+	 * Sets the robot on a course headed in the direction of vector
+	 * (x, y) relative to its current orientation with the option to
+	 * simultaneously turn
+	 * @param x lateral movement
+	 * @param y forward movement
+	 */
+	public void setDirectionVector(double x, double y) {
+		setDirectionVector(x, y, 0);
 	}
 
 	/**
