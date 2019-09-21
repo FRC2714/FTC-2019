@@ -5,7 +5,7 @@ import java.util.List;
 
 public class MecanumKinematics {
 
-    static Pose2d wheelToRobotVelocity(List<Double> wheelVelocities, double trackWidth) {
+    public static Pose2d wheelToRobotVelocity(List<Double> wheelVelocities, double trackWidth) {
         // front left, rear left, rear right, front right
         return new Pose2d(
                 wheelVelocities.stream().mapToDouble(a -> a).sum(),
@@ -14,7 +14,7 @@ public class MecanumKinematics {
         ).times(0.25);
     }
 
-    static List<Double> robotToWheelVelocites(Pose2d robotVel, double trackWidth) {
+    public static List<Double> robotToWheelVelocites(Pose2d robotVel, double trackWidth) {
         List<Double> wheelVelos = new ArrayList<>();
         wheelVelos.add(robotVel.x - robotVel.y - trackWidth * robotVel.heading);
         wheelVelos.add(robotVel.x + robotVel.y - trackWidth * robotVel.heading);
