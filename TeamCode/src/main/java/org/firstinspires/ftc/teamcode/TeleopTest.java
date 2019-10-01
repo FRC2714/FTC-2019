@@ -35,18 +35,21 @@ public class TeleopTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            double x = Math.pow(gamepad1.left_stick_x, 3);
+            double y = Math.pow(gamepad1.left_stick_y, 3);
+            double heading = -1 * Math.pow(gamepad1.right_stick_x, 3);
             Pose2d gamepadVelocity = new Pose2d(
-                    -gamepad1.left_stick_x,
-                    -gamepad1.left_stick_y,
-                    -gamepad1.right_stick_x * .75
+                    x,
+                    y,
+                    heading
             );
-
-
+            telemetry.addData("x: ",x);
+            telemetry.addData("y: ", y);
+            telemetry.addData("heading: ", heading);
 
             List<Double> wheelVelocities = MecanumKinematics.robotToWheelVelocites(gamepadVelocity, 13);
             telemetry.addData("Velo 1: ", wheelVelocities.get(0));
             telemetry.addData("Velo 2: ", wheelVelocities.get(1));
-            telemetry.addData("chump: ", "fshkdkfjsdhf");
             telemetry.update();
             frontLeft.setPower(wheelVelocities.get(0));
             rearLeft.setPower(wheelVelocities.get(1));
