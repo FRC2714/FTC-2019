@@ -8,10 +8,10 @@ public class Kinematics {
         return new Pose2d(fieldPoseVelocity.vec().rotated(-fieldPose.heading), fieldPoseVelocity.heading);
     }
 
-    static List<Double> calculateMotorFeedforward(List<Double> velocities, List<Double> acclerations, double kV, double kA, double kStatic) {
+    static List<Double> calculateMotorFeedforward(List<Double> velocities, List<Double> accelerations, double kV, double kA, double kStatic) {
         List<Double> motorPowers = new ArrayList<>();
         for (double v : velocities) {
-            for (double a: acclerations) {
+            for (double a: accelerations) {
                 motorPowers.add(v * kV + a * kA + kStatic);
             }
         }
