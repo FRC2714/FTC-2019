@@ -129,7 +129,6 @@ public class Drivetrain {
 		return wheels[2].getVelocity();
 	}
 
-
 	public double getRightEncoder(){
 		return wheels[2].getCurrentPosition();
 	}
