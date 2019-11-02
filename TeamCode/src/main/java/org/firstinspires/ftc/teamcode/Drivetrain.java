@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import java.util.Timer;
+
 public class Drivetrain {
 
 	final String[] wheelNames = { "left_front", "left_back", "right_front", "right_back" };
@@ -14,7 +16,9 @@ public class Drivetrain {
 
 	private HardwareMap hardwareMap;
 
-	private DcMotor[] wheels;
+	private DcMotorEx[] wheels;
+
+	public BasicOdometer odometer;
 
 	/**
 	 * Ensures that only one instance of `Drivetrain` exists and that it
@@ -29,11 +33,11 @@ public class Drivetrain {
 
 	private Drivetrain(HardwareMap hm) {
 		hardwareMap = hm;
-
-		wheels = new DcMotor[wheelNames.length];
+		odometer = new BasicOdometer(hardwareMap);
+		wheels = new DcMotorEx[wheelNames.length];
 
 		for (int i = 0; i < wheelNames.length; i++) {
-			wheels[i] = hardwareMap.dcMotor.get(wheelNames[i]);
+			wheels[i] = hardwareMap.get(DcMotorEx.class, wheelNames[i]);
 			wheels[i].setPower(0);
 		}
 
@@ -112,4 +116,26 @@ public class Drivetrain {
 	private double clamp(double num, double min, double max) {
 		return Math.min(Math.max(num, min), max);
 	}
+
+	public double getLeftEncoder(){
+		return wheels[0].getCurrentPosition();
+	}
+
+	public double getLeftVelocity(){
+		return wheels[0].getVelocity();
+	}
+
+	public double getRightVelocity(){
+		return wheels[2].getVelocity();
+	}
+
+
+	public double getRightEncoder(){
+		return wheels[2].getCurrentPosition();
+	}
+
+	public void updatePosition(){
+
+	}
+
 }
