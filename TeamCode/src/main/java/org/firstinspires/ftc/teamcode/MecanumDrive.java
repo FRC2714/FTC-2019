@@ -11,15 +11,15 @@ import java.util.Timer;
 
 public class MecanumDrive extends OpMode {
 
-	final static double DEADZONE = 0.01;
-	Drivetrain drivetrain;
-	Arm arm;
+	private final static double DEADZONE = 0.01;
+	private Drivetrain drivetrain;
+	private Arm arm;
 	static Telemetry tele;
 	double currTime;
 
 	Timer timer = new Timer();
 
-	boolean resetArmAtStartup = true;
+	private boolean resetArmAtStartup = true;
 
 	/**
 	 * First function loaded at beginning
@@ -38,10 +38,9 @@ public class MecanumDrive extends OpMode {
 	 */
 	@Override
 	public void loop() {
-		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.75){
-			arm.setArmMotor(0.4);
-		}
-		resetArmAtStartup = false;
+//		setupArm();
+		if(resetArmAtStartup)
+			setupArm();
 
 		double deltaTime = (System.nanoTime() / 1e9) - currTime;
 		currTime = System.nanoTime() / 1e9;
@@ -75,6 +74,8 @@ public class MecanumDrive extends OpMode {
 			arm.setServo(1);
 		if (b)
 			arm.setServo(0.68);
+//		if(a)
+//			arm.setIntakeServo();
 
 		if (rb)
 			arm.setIntakeMotor(-1.0);
@@ -102,4 +103,16 @@ public class MecanumDrive extends OpMode {
 		telemetry.addData("Arm Potentiometer Voltage", arm.getArmPotentiometerPosition());
 		telemetry.addData("Y Stick", manualArmInput);
 	}
+
+	public void setupArm(){
+		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.75){
+			arm.setArmMotor(0.4);
+		}
+		if (resetArmAtStartup) {
+			arm.setArmMotor(0);
+			arm.resetEncoders();
+		}
+		resetArmAtStartup = false;
+	}
+
 }
