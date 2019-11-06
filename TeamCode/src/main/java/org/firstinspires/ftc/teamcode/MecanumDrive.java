@@ -38,7 +38,10 @@ public class MecanumDrive extends OpMode {
 	 */
 	@Override
 	public void loop() {
-
+		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.75){
+			arm.setArmMotor(0.4);
+		}
+		resetArmAtStartup = false;
 
 		double deltaTime = (System.nanoTime() / 1e9) - currTime;
 		currTime = System.nanoTime() / 1e9;
