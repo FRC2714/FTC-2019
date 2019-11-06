@@ -39,17 +39,19 @@ public class Drivetrain {
 		for (int i = 0; i < wheelNames.length; i++) {
 			wheels[i] = hardwareMap.get(DcMotorEx.class, wheelNames[i]);
 			wheels[i].setPower(0);
+			wheels[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 
 		wheels[2].setDirection(DcMotorSimple.Direction.REVERSE);
 		wheels[3].setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 
+
 	/**
 	 * Set the encoder mode of each motor
 	 * @param useEncoders whether or not to allow encoder use
 	 */
-	public void setUseEncoders(boolean useEncoders) {
+	public void setEncoderState(boolean useEncoders) {
 		for (int i = 0; i < wheelNames.length; i++) {
 			wheels[i].setMode(useEncoders ? DcMotor.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 		}
@@ -136,6 +138,19 @@ public class Drivetrain {
 
 	public void updatePosition(){
 
+	}
+
+	public void setRunToEncoderMode(){
+		for (int i = 0; i < wheelNames.length; i++) {
+			wheels[i].setTargetPosition(-500);
+			wheels[i].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		}
+	}
+
+	public void resetEncoders(){
+		for (int i = 0; i < wheelNames.length; i++) {
+			wheels[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		}
 	}
 
 }
