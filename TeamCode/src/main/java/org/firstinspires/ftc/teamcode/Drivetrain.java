@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.OrientationSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import java.util.Timer;
@@ -20,6 +21,8 @@ public class Drivetrain {
 
 	public BasicOdometer odometer;
 
+	OrientationSensor imu;
+
 	/**
 	 * Ensures that only one instance of `Drivetrain` exists and that it
 	 * is used globally
@@ -35,7 +38,6 @@ public class Drivetrain {
 		hardwareMap = hm;
 		odometer = new BasicOdometer(hardwareMap);
 		wheels = new DcMotorEx[wheelNames.length];
-
 		for (int i = 0; i < wheelNames.length; i++) {
 			wheels[i] = hardwareMap.get(DcMotorEx.class, wheelNames[i]);
 			wheels[i].setPower(0);
@@ -151,6 +153,10 @@ public class Drivetrain {
 		for (int i = 0; i < wheelNames.length; i++) {
 			wheels[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		}
+	}
+
+	public double getHeadingAngle(){
+		return odometer.getHeading();
 	}
 
 }

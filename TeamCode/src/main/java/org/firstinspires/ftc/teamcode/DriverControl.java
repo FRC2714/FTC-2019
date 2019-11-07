@@ -9,9 +9,8 @@ import java.util.Timer;
 
 import static org.firstinspires.ftc.teamcode.Arm.*;
 
-@TeleOp(name = "Mecanum Drive", group = "Prototype")
-
-public class MecanumDrive extends OpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Prototype")
+public class DriverControl extends OpMode {
 
 	private final static double DEADZONE = 0.01;
 	private Drivetrain drivetrain;
@@ -56,12 +55,12 @@ public class MecanumDrive extends OpMode {
 		}
 		drivetrain.updatePosition();
 
-		boolean a = gamepad2.a,
-				b = gamepad2.b,
-				x = gamepad2.x,
-				y = gamepad2.y,
-				lb = gamepad2.left_bumper,
-				rb = gamepad2.right_bumper;
+		boolean a = gamepad1.a,
+				b = gamepad1.b,
+				x = gamepad1.x,
+				y = gamepad1.y,
+				lb = gamepad1.left_bumper,
+				rb = gamepad1.right_bumper;
 
 		double manualArmInput = -gamepad2.left_stick_y;
 
