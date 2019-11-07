@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Timer;
 
+import static org.firstinspires.ftc.teamcode.Arm.*;
+
 @TeleOp(name = "Mecanum Drive", group = "Prototype")
 
 public class MecanumDrive extends OpMode {
@@ -27,7 +29,7 @@ public class MecanumDrive extends OpMode {
 	@Override
 	public void init() {
 		drivetrain = Drivetrain.getInstance(hardwareMap);
-		arm = Arm.getInstance(hardwareMap);
+		arm = getInstance(hardwareMap);
 		drivetrain.resetEncoders();
 		drivetrain.setEncoderState(true);
 		tele = telemetry;
@@ -63,17 +65,30 @@ public class MecanumDrive extends OpMode {
 
 		double manualArmInput = -gamepad2.left_stick_y;
 
-		/*
-		if (a) { arm.goToPosition(carry); }
-		if (b) { arm.goToPosition(pickUp); }
-		if (x) { arm.goToPosition(tuck); }
-		if (y) { arm.goToPosition(stack); }
-		 */
+
+		if (x) {
+			arm.setServo(ServoPosition.RELAXED);
+			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
+			arm.setServo(ServoPosition.PRESSURE_STONE);
+			arm.setIntakeMotor(-1, 0.5);
+			arm.goToPosition(ArmPosition.STONE_HOLD, 1);
+		}
+
+		if (y) {
+			arm.setServo(ServoPosition.PRESSURE_STONE);
+			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
+			arm.setServo(ServoPosition.RELAXED);
+			arm.setIntakeMotor(1, 0.3);
+			arm.goToPosition(ArmPosition.STONE_HOLD, 1);
+		}
+
+//		if (y) { arm.goToPosition(stack); }
+
 
 		if (a)
-			arm.setServo(1);
+			arm.setServo(ServoPosition.RELAXED);
 		if (b)
-			arm.setServo(0.68);
+			arm.setServo(ServoPosition.PRESSURE_STONE);
 //		if(a)
 //			arm.setIntakeServo();
 
@@ -92,12 +107,19 @@ public class MecanumDrive extends OpMode {
 				arm.setArmMotor(1);
 			else
 				arm.setArmMotor(0.0);
+		} else if((arm.getArmPotentiometerPosition() < 0.02)){
+			if (manualArmInput < -0.07)
+				arm.setArmMotor(1);
+			else
+				arm.setArmMotor(0);
 		} else {
 			if (manualArmInput > 0.07)
 				arm.setArmMotor(-1);
 			else
 				arm.setArmMotor(0);
 		}
+
+		arm.update();
 
 		telemetry.addData("Arm Motor Encoder Position", arm.getArmMotorEncoderPosition());
 		telemetry.addData("Arm Potentiometer Voltage", arm.getArmPotentiometerPosition());

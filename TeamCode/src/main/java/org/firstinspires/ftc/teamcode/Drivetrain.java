@@ -53,7 +53,7 @@ public class Drivetrain {
 	 */
 	public void setEncoderState(boolean useEncoders) {
 		for (int i = 0; i < wheelNames.length; i++) {
-			wheels[i].setMode(useEncoders ? DcMotor.RunMode.RUN_USING_ENCODER : DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+			wheels[i].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 		}
 	}
 

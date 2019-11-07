@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.internal.tfod.Timer;
 
 public class Arm {
 
     private static Arm arm;
-
+    private boolean isArmMotionProfiling = false;
     private HardwareMap hardwareMap;
 
     private DcMotorEx armMotor;
@@ -40,19 +42,52 @@ public class Arm {
     }
 
     public void setArmMotor(double speed){
-        armMotor.setPower(speed);
+        if(!isArmMotionProfiling)
+            armMotor.setPower(speed);
     }
 
     public void setIntakeMotor(double speed){
         intakeMotor.setPower(speed);
     }
 
-    public void goToPosition(double position) {
+    public void setIntakeMotor(double speed, double time){
+        ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+        intakeMotor.setPower(speed);
+        while (timer.seconds() < time){
+
+        }
+        intakeMotor.setPower(0);
+    }
+
+    public void goToPosition(ArmPosition position, double power) {
+        isArmMotionProfiling = true;
+        switch (position){
+            case STARTING:
+                armMotor.setTargetPosition(0);
+                break;
+            case STONE_HOLD:
+                armMotor.setTargetPosition(-330);
+                break;
+            case STONE_PICKUP:
+                armMotor.setTargetPosition(-1300);
+                break;
+        }
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(power);
+        while (!(Math.abs(armMotor.getTargetPosition() - armMotor.getCurrentPosition()) < 50)){
+
+        }
 
     }
 
-    public void setServo(double servoVal){
-        intakeServo.setPosition(servoVal);
+    public void setServo(ServoPosition servoPosition){
+        switch (servoPosition){
+            case RELAXED:
+                intakeServo.setPosition(1);
+                break;
+            case PRESSURE_STONE:
+                intakeServo.setPosition(0.68);
+        }
     }
 
     public void setIntakeServo() {
@@ -79,5 +114,25 @@ public class Arm {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void update(){
+        if(isArmMotionProfiling)
+            if(Math.abs(armMotor.getTargetPosition() - armMotor.getCurrentPosition()) < 50) {
+                isArmMotionProfiling = false;
+                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+
+    }
+
+    enum ArmPosition {
+        STARTING,
+        STONE_HOLD,
+        STONE_PICKUP,
+    }
+
+    enum ServoPosition {
+        PRESSURE_STONE,
+        RELAXED,
+    }
 
 }
