@@ -65,6 +65,8 @@ public class VisionTest extends LinearOpMode {
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
 
+    String stonePosition = "";
+
     /**
      * This is the webcam we are to use. As with other hardware devices such as motors and
      * servos, this device is identified using the robot configuration tool in the FTC application.
@@ -144,11 +146,13 @@ public class VisionTest extends LinearOpMode {
             dashboard.sendTelemetryPacket(new TelemetryPacket());
 
             if (p.getVumarkLeftBoundary() < 300)
-                telemetry.addData("Skystone Left", p.getVumarkLeftBoundary());
+                stonePosition = "Skystone Left";
             else if (p.getVumarkLeftBoundary() < 700)
-                telemetry.addData("Skystone Center", p.getVumarkLeftBoundary());
+                stonePosition = "Skystone Center";
             else
-                telemetry.addData("Skystone Right", p.getVumarkLeftBoundary());
+                stonePosition = "Skystone Right";
+
+            telemetry.addData(stonePosition, p.getVumarkLeftBoundary());
             telemetry.update();
         }
 
@@ -156,7 +160,7 @@ public class VisionTest extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-
+            telemetry.addData("Stone Position Last Known - ", stonePosition);
         }
     }
 
