@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.localization;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -43,7 +43,7 @@ public class BasicOdometer extends Thread{
 
     public double getHeading(){
         Orientation orientation =  imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return orientation.thirdAngle;
+        return orientation.firstAngle;
     }
 
     

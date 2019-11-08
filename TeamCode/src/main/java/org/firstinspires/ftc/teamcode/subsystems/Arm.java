@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.internal.tfod.Timer;
 
 public class Arm {
 
@@ -87,6 +85,7 @@ public class Arm {
                 break;
             case PRESSURE_STONE:
                 intakeServo.setPosition(0.68);
+                break;
         }
     }
 
@@ -124,13 +123,13 @@ public class Arm {
 
     }
 
-    enum ArmPosition {
+    public enum ArmPosition {
         STARTING,
         STONE_HOLD,
         STONE_PICKUP,
     }
 
-    enum ServoPosition {
+    public enum ServoPosition {
         PRESSURE_STONE,
         RELAXED,
     }

@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.OrientationSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import java.util.Timer;
+import org.firstinspires.ftc.teamcode.localization.BasicOdometer;
 
 public class Drivetrain {
 
@@ -22,6 +21,8 @@ public class Drivetrain {
 	public BasicOdometer odometer;
 
 	OrientationSensor imu;
+
+	boolean isAutonEnabled = false;
 
 	/**
 	 * Ensures that only one instance of `Drivetrain` exists and that it
@@ -38,6 +39,7 @@ public class Drivetrain {
 		hardwareMap = hm;
 		odometer = new BasicOdometer(hardwareMap);
 		wheels = new DcMotorEx[wheelNames.length];
+
 		for (int i = 0; i < wheelNames.length; i++) {
 			wheels[i] = hardwareMap.get(DcMotorEx.class, wheelNames[i]);
 			wheels[i].setPower(0);
@@ -67,10 +69,25 @@ public class Drivetrain {
 	 * @param br back-right motor
 	 */
 	public void setPower(double fl, double fr, double bl, double br) {
-		wheels[0].setPower(clamp(fl, -1, 1));
-		wheels[1].setPower(clamp(fr, -1, 1));
-		wheels[2].setPower(clamp(bl, -1, 1));
-		wheels[3].setPower(clamp(br, -1, 1));
+		if (!isAutonEnabled) {
+			wheels[0].setPower(clamp(fl, -1, 1));
+			wheels[1].setPower(clamp(fr, -1, 1));
+			wheels[2].setPower(clamp(bl, -1, 1));
+			wheels[3].setPower(clamp(br, -1, 1));
+		}
+	}
+	/**
+	 * Sets the powers of each wheel
+	 * @param fl front-left motor
+	 * @param fr front-right motor
+	 * @param bl back-left motor
+	 * @param br back-right motor
+	 */
+	public void setAutonPower(double fl, double fr, double bl, double br) {
+			wheels[0].setPower(clamp(fl, -1, 1));
+			wheels[1].setPower(clamp(fr, -1, 1));
+			wheels[2].setPower(clamp(bl, -1, 1));
+			wheels[3].setPower(clamp(br, -1, 1));
 	}
 
 	/**
@@ -158,5 +175,24 @@ public class Drivetrain {
 	public double getHeadingAngle(){
 		return odometer.getHeading();
 	}
+
+	public void setLinearMotion(double leftMotor, double rightMotor, double finalPosition, double angle, boolean isGyroEnabled){
+		isAutonEnabled = true;
+	    while (Math.abs(getRightEncoder() + getLeftEncoder())/2 < Math.abs(finalPosition)){
+            double angularError = getHeadingAngle() - angle;
+            double angularCorrection = angularError * 0.05;
+            setAutonPower(leftMotor + angularCorrection, rightMotor - angularCorrection, leftMotor + angularCorrection, rightMotor - angularCorrection);
+        }
+	    setAutonPower(0,0,0,0);
+    }
+
+    public void setRunToEncoderMotion(double power, int finalPosition, double angle, boolean isGyroEnabled){
+		isAutonEnabled = true;
+        for (int i = 0; i < wheelNames.length; i++) {
+            wheels[i].setTargetPosition(finalPosition);
+            wheels[i].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+		setAutonPower(power,power,power,power);
+    }
 
 }

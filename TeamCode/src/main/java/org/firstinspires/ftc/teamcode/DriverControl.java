@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.Timer;
 
-import static org.firstinspires.ftc.teamcode.Arm.*;
+import static org.firstinspires.ftc.teamcode.subsystems.Arm.*;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Prototype")
 public class DriverControl extends OpMode {
@@ -55,12 +56,12 @@ public class DriverControl extends OpMode {
 		}
 		drivetrain.updatePosition();
 
-		boolean a = gamepad1.a,
-				b = gamepad1.b,
-				x = gamepad1.x,
-				y = gamepad1.y,
-				lb = gamepad1.left_bumper,
-				rb = gamepad1.right_bumper;
+		boolean a = gamepad2.a,
+				b = gamepad2.b,
+				x = gamepad2.x,
+				y = gamepad2.y,
+				lb = gamepad2.left_bumper,
+				rb = gamepad2.right_bumper;
 
 		double manualArmInput = -gamepad2.left_stick_y;
 
@@ -81,13 +82,16 @@ public class DriverControl extends OpMode {
 			arm.goToPosition(ArmPosition.STONE_HOLD, 1);
 		}
 
-//		if (y) { arm.goToPosition(stack); }
-
-
 		if (a)
 			arm.setServo(ServoPosition.RELAXED);
 		if (b)
 			arm.setServo(ServoPosition.PRESSURE_STONE);
+
+//        if(a)
+//            drivetrain.setLinearMotion(-0.7,-0.7,-800,0,true);
+//        if(b)
+//            drivetrain.setRunToEncoderMotion(0.5,-800,0,true);
+
 //		if(a)
 //			arm.setIntakeServo();
 
@@ -122,8 +126,9 @@ public class DriverControl extends OpMode {
 
 		telemetry.addData("Arm Motor Encoder Position", arm.getArmMotorEncoderPosition());
 		telemetry.addData("Arm Potentiometer Voltage", arm.getArmPotentiometerPosition());
-		telemetry.addData("Y Stick", manualArmInput);
-	}
+        telemetry.addData("Average Position", (drivetrain.getRightEncoder() + drivetrain.getLeftEncoder())/2);
+        telemetry.addData("Heading Angle", drivetrain.getHeadingAngle());
+    }
 
 	public void setupArm(){
 		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.75){
