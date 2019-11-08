@@ -40,7 +40,6 @@ public class DriverControl extends OpMode {
 	 */
 	@Override
 	public void loop() {
-//		setupArm();
 		if(resetArmAtStartup)
 			setupArm();
 
@@ -61,31 +60,37 @@ public class DriverControl extends OpMode {
 				x = gamepad2.x,
 				y = gamepad2.y,
 				lb = gamepad2.left_bumper,
-				rb = gamepad2.right_bumper;
+				rb = gamepad2.right_bumper,
+                dpad_down = gamepad2.dpad_down;
+
 
 		double manualArmInput = -gamepad2.left_stick_y;
 
 
-		if (x) {
+		if (dpad_down) {
 			arm.setServo(ServoPosition.RELAXED);
 			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
 			arm.setServo(ServoPosition.PRESSURE_STONE);
 			arm.setIntakeMotor(-1, 0.5);
-			arm.goToPosition(ArmPosition.STONE_HOLD, 1);
+			arm.goToPosition(ArmPosition.SAFE_HOLD, 1);
 		}
 
-		if (y) {
-			arm.setServo(ServoPosition.PRESSURE_STONE);
-			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
-			arm.setServo(ServoPosition.RELAXED);
-			arm.setIntakeMotor(1, 0.3);
-			arm.goToPosition(ArmPosition.STONE_HOLD, 1);
-		}
+//		if (y) {
+//			arm.setServo(ServoPosition.PRESSURE_STONE);
+//			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
+//			arm.setServo(ServoPosition.RELAXED);
+//			arm.setIntakeMotor(1, 0.3);
+//			arm.goToPosition(ArmPosition.SAFE_HOLD, 1);
+//		}
+
+
 
 		if (a)
-			arm.setServo(ServoPosition.RELAXED);
+			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
 		if (b)
-			arm.setServo(ServoPosition.PRESSURE_STONE);
+			arm.goToPosition(ArmPosition.SAFE_HOLD, 1);
+		if(x)
+		    arm.goToPosition(ArmPosition.HIGH_HOLD, 1);
 
 //        if(a)
 //            drivetrain.setLinearMotion(-0.7,-0.7,-800,0,true);

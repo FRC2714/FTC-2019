@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
+
 import android.graphics.Bitmap;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -19,17 +18,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvWebcam;
-
-import java.util.concurrent.BlockingQueue;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-/**
- NOTE: I USE VUFORIA TO RUN MY PIPELINE BC EASY OPEN CV DOESNT WORK FOR ME
- FIRST TRY TO USE EASY OPEN CV, YOU CAN ACHIEVE BETTER FRAMERATES THIS WAY
- */
 
 @Config
 @TeleOp(name="VisionTest")
@@ -49,7 +39,9 @@ public class VisionTest extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = "";
+    private static final String VUFORIA_KEY =
+            "AT8pGt3/////AAABmQ9LKBWthkikgQSErtn4C1GN+U/k35mErGuydnhrXtBLs2+wEnRYzMx2qJC0Q+4bHLUaWRZ18gRQcTZOoaKDYfG7yIcNfsexI4G5IdAgwfAZnSbrWco7IW2mdaHZrQ5mw/u0mh1RHbcPdK3JAheEknMP53n73JNNBFbEcB+IN2qPSI4AUrWqK3TuAl7XCnEBQrHKB7kU62rXWs+4r4/RcNB0g/yMZ3S5Yv7vfHYGMEA3/Wj+4PC/6v/pO9StgMjxKaVZMjTYiHvUN6yi6CgVfQlKlmkEMU0IR60PcUgA9hKq9CPXVNPN1tXCTGFGdd+WbhFEGdkbZxY3scU85G4kDQy2oNbFRaClpdHYINBOV1U1";
+
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
     private static final float mmPerInch        = 25.4f;
@@ -87,7 +79,6 @@ public class VisionTest extends LinearOpMode {
     VisionPipeline p;
 
     private boolean shouldWrite = false;
-    @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
     public void runOpMode() {
         p = new VisionPipeline();
@@ -119,9 +110,9 @@ public class VisionTest extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
 
         Mat frame;
-        waitForStart();
 
-        while (opModeIsActive()) {
+
+        while (!opModeIsActive()) {
             if (gamepad1.a)
                 shouldWrite = true;
             else
@@ -149,18 +140,29 @@ public class VisionTest extends LinearOpMode {
                     }
                 }
             }
+
             dashboard.sendTelemetryPacket(new TelemetryPacket());
-            telemetry.addData("gfsdafdsy: ",p.getVumarkLeftBoundary());
+
+            if (p.getVumarkLeftBoundary() < 300)
+                telemetry.addData("Skystone Left", p.getVumarkLeftBoundary());
+            else if (p.getVumarkLeftBoundary() < 700)
+                telemetry.addData("Skystone Center", p.getVumarkLeftBoundary());
+            else
+                telemetry.addData("Skystone Right", p.getVumarkLeftBoundary());
             telemetry.update();
         }
 
+        waitForStart();
+
+
+        while (opModeIsActive()) {
+
+        }
     }
 
     private Mat bitmapToMat (Bitmap bit, int cvType) {
         Mat newMat = new Mat(bit.getHeight(), bit.getWidth(), cvType);
-
         Utils.bitmapToMat(bit, newMat);
-
         return newMat;
     }
 

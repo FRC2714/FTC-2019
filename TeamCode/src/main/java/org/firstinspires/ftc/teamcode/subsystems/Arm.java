@@ -63,8 +63,11 @@ public class Arm {
             case STARTING:
                 armMotor.setTargetPosition(0);
                 break;
-            case STONE_HOLD:
+            case SAFE_HOLD:
                 armMotor.setTargetPosition(-330);
+                break;
+            case HIGH_HOLD:
+                armMotor.setTargetPosition(-250);
                 break;
             case STONE_PICKUP:
                 armMotor.setTargetPosition(-1300);
@@ -119,15 +122,14 @@ public class Arm {
                 isArmMotionProfiling = false;
                 armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-
-
     }
 
     public enum ArmPosition {
         STARTING,
-        STONE_HOLD,
-        STONE_PICKUP,
-    }
+        SAFE_HOLD,
+        HIGH_HOLD,
+        STONE_PICKUP
+        }
 
     public enum ServoPosition {
         PRESSURE_STONE,

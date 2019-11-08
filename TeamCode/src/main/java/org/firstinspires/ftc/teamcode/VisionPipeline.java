@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import org.opencv.core.Core;
@@ -11,16 +9,12 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class VisionPipeline extends OpenCvPipeline{
     // THIS DETECTOR RETURNS THE PIXEL LOCATION OF THE LEFT MOST BOUNDARY OF THE BLACK TARGET
@@ -77,7 +71,6 @@ public class VisionPipeline extends OpenCvPipeline{
 
     private final int INDEX_ERROR = -2; // index error code
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     public Mat processFrame(Mat input) {
         Mat workingMat = input.clone();
         Imgproc.cvtColor(workingMat,workingMat,Imgproc.COLOR_RGB2HSV); // convert to HSV space
@@ -187,7 +180,6 @@ public class VisionPipeline extends OpenCvPipeline{
         return new Mat(image, rect);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private int getMaxDropoff(Mat image) {
 
         Mat colsums = new Mat();
