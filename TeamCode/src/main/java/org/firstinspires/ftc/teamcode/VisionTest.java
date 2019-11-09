@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.vuforia.Image;
@@ -12,20 +13,32 @@ import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.teamcode.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
+import static org.firstinspires.ftc.teamcode.subsystems.Arm.getInstance;
 
 @Config
-@TeleOp(name="VisionTest")
+@Autonomous(name="VisionTest")
 public class VisionTest extends LinearOpMode {
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false  ;
+
+    private final static double DEADZONE = 0.01;
+    private Drivetrain drivetrain;
+    private Arm arm;
+    static Telemetry tele;
+    double currTime;
+
+    boolean runOnce = true;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -84,6 +97,7 @@ public class VisionTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         p = new VisionPipeline();
+        initialize();
         // webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         /*
@@ -138,12 +152,12 @@ public class VisionTest extends LinearOpMode {
                         Mat ret = p.processFrame(mat);
                         Bitmap displayBitmap = Bitmap.createBitmap(ret.width(), ret.height(), Bitmap.Config.RGB_565);
                         Utils.matToBitmap(ret, displayBitmap);
-                        dashboard.sendImage(displayBitmap);
+//                        dashboard.sendImage(displayBitmap);
                     }
                 }
             }
 
-            dashboard.sendTelemetryPacket(new TelemetryPacket());
+//            dashboard.sendTelemetryPacket(new TelemetryPacket());
 
             if (p.getVumarkLeftBoundary() < 300)
                 stonePosition = "Skystone Left";
@@ -161,6 +175,20 @@ public class VisionTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             telemetry.addData("Stone Position Last Known - ", stonePosition);
+//            if(stonePosition.equals("Skystone Center")){
+                if(runOnce) {
+                    drivetrain.setLinearMotion(0.5, 0.5, 770, 0, false);
+                    arm.setServo(Arm.ServoPosition.RELAXED);
+                    arm.goToPosition(Arm.ArmPosition.STONE_PICKUP, 1);
+                    arm.setServo(Arm.ServoPosition.PRESSURE_STONE);
+                    arm.setIntakeMotor(-1, 0.6);
+                    arm.goToPosition(Arm.ArmPosition.SAFE_HOLD, 1);
+                    drivetrain.resetEncoders();
+                    drivetrain.setEncoderState(true);
+                    drivetrain.setLinearMotion(-0.5, -0.5, -400, 0, false);
+                    runOnce = false;
+                }
+//            }
         }
     }
 
@@ -168,6 +196,14 @@ public class VisionTest extends LinearOpMode {
         Mat newMat = new Mat(bit.getHeight(), bit.getWidth(), cvType);
         Utils.bitmapToMat(bit, newMat);
         return newMat;
+    }
+
+    public void initialize() {
+        drivetrain = Drivetrain.getInstance(hardwareMap);
+        arm = getInstance(hardwareMap);
+        drivetrain.resetEncoders();
+        drivetrain.setEncoderState(true);
+        tele = telemetry;
     }
 
 }

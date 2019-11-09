@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.OrientationSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.localization.BasicOdometer;
 
@@ -16,7 +17,7 @@ public class Drivetrain {
 
 	private HardwareMap hardwareMap;
 
-	private DcMotorEx[] wheels;
+	public DcMotorEx[] wheels;
 
 	public BasicOdometer odometer;
 
@@ -46,8 +47,9 @@ public class Drivetrain {
 			wheels[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 
-		wheels[2].setDirection(DcMotorSimple.Direction.REVERSE);
-		wheels[3].setDirection(DcMotorSimple.Direction.REVERSE);
+		wheels[0].setDirection(DcMotorSimple.Direction.REVERSE);
+		wheels[1].setDirection(DcMotorSimple.Direction.REVERSE);
+
 	}
 
 
@@ -180,11 +182,26 @@ public class Drivetrain {
 		isAutonEnabled = true;
 	    while (Math.abs(getRightEncoder() + getLeftEncoder())/2 < Math.abs(finalPosition)){
             double angularError = getHeadingAngle() - angle;
-            double angularCorrection = angularError * 0.05;
-            setAutonPower(leftMotor + angularCorrection, rightMotor - angularCorrection, leftMotor + angularCorrection, rightMotor - angularCorrection);
+            double angularCorrection = angularError * 0.02;
+            setAutonPower(leftMotor - angularCorrection, rightMotor + angularCorrection, leftMotor - angularCorrection, rightMotor + angularCorrection);
         }
 	    setAutonPower(0,0,0,0);
+	    isAutonEnabled = false;
     }
+
+    public void turnToAngle(double expectedAngle){
+		double angleDiff = expectedAngle;
+		isAutonEnabled = true;
+
+		while (Math.abs(angleDiff) > 3) {
+			double kP = 0.007;
+			angleDiff = getHeadingAngle() - expectedAngle;
+			double corection = angleDiff * kP;
+			setAutonPower(corection, corection, -corection, -corection);
+		}
+		setAutonPower(0,0,0,0);
+		isAutonEnabled = false;
+	}
 
     public void setRunToEncoderMotion(double power, int finalPosition, double angle, boolean isGyroEnabled){
 		isAutonEnabled = true;
@@ -194,5 +211,29 @@ public class Drivetrain {
         }
 		setAutonPower(power,power,power,power);
     }
+
+    public void setStrafeTime(double power, double time){
+		isAutonEnabled = true;
+		ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+		while (elapsedTime.seconds() > time){
+			setAutonPower(-power, power,power,-power);
+		}
+		setAutonPower(0,0,0,0);
+		isAutonEnabled = false;
+	}
+
+	public void setStrafePosition(int position, double power){
+		isAutonEnabled = true;
+		wheels[0].setTargetPosition(-position);
+		wheels[1].setTargetPosition(position);
+		wheels[2].setTargetPosition(position);
+		wheels[3].setTargetPosition(-position);
+
+		for (int i = 0; i < wheelNames.length; i++) {
+			wheels[i].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+			wheels[i].setPower(power);
+		}
+
+	}
 
 }

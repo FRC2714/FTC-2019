@@ -55,9 +55,9 @@ public class DriverControlLinearOp extends LinearOpMode {
 
 		double deltaTime = (System.nanoTime() / 1e9) - currTime;
 		currTime = System.nanoTime() / 1e9;
-		double forwardInput = gamepad1.left_stick_x,
-				strafeInput = gamepad1.left_stick_y,
-				turnInput = gamepad1.right_stick_x;
+		double forwardInput = -gamepad1.left_stick_x,
+				strafeInput = -gamepad1.left_stick_y,
+				turnInput = -gamepad1.right_stick_x;
 		if (forwardInput * forwardInput + strafeInput * strafeInput > DEADZONE || Math.abs(turnInput) > DEADZONE) {
 			drivetrain.setDirectionVector(forwardInput, strafeInput, turnInput);
 		} else {
@@ -73,9 +73,11 @@ public class DriverControlLinearOp extends LinearOpMode {
 				rb = gamepad2.right_bumper,
                 dpad_down = gamepad2.dpad_down;
 
+		double lTrigger = gamepad2.left_trigger;
+		double rTrigger = gamepad2.right_trigger;
 
-		double manualArmInput = -gamepad2.left_stick_y;
 
+		double manualArmInput = gamepad2.left_stick_y;
 
 		if (dpad_down) {
 			arm.setServo(ServoPosition.RELAXED);
@@ -112,11 +114,15 @@ public class DriverControlLinearOp extends LinearOpMode {
 
 		if (rb)
 			arm.setIntakeMotor(-1.0);
-		else if(lb)
+		else if(Math.abs(rTrigger) > 0.2)
 			arm.setIntakeMotor(1.0);
 		else
-			arm.setIntakeMotor(0.0);
+			arm.setIntakeMotor(0);
 
+		if(lb)
+			arm.setServo(ServoPosition.PRESSURE_STONE);
+		else if(Math.abs(lTrigger) > 0.2)
+			arm.setServo(ServoPosition.RELAXED);
 
 		if(!(arm.getArmPotentiometerPosition() > 0.67)) {
 			if (manualArmInput > 0.07)
@@ -143,8 +149,12 @@ public class DriverControlLinearOp extends LinearOpMode {
 		telemetry.addData("Arm Potentiometer Voltage", arm.getArmPotentiometerPosition());
         telemetry.addData("Average Position", (drivetrain.getRightEncoder() + drivetrain.getLeftEncoder())/2);
         telemetry.addData("Heading Angle", drivetrain.getHeadingAngle());
+		telemetry.addData("wheels[0]", drivetrain.wheels[0].getCurrentPosition());
+		telemetry.addData("wheels[1]", drivetrain.wheels[1].getCurrentPosition());
+		telemetry.addData("wheels[2]", drivetrain.wheels[2].getCurrentPosition());
+		telemetry.addData("wheels[3]", drivetrain.wheels[3].getCurrentPosition());
         telemetry.update();
-    }
+	}
 
 	public void setupArm(){
 		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.86){

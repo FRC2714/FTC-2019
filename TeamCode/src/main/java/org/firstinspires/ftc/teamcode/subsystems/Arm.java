@@ -52,7 +52,7 @@ public class Arm {
         ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         intakeMotor.setPower(speed);
         while (timer.seconds() < time){
-
+            
         }
         intakeMotor.setPower(0);
     }
@@ -64,13 +64,13 @@ public class Arm {
                 armMotor.setTargetPosition(0);
                 break;
             case SAFE_HOLD:
-                armMotor.setTargetPosition(-330);
+                armMotor.setTargetPosition(-1100);
                 break;
             case HIGH_HOLD:
-                armMotor.setTargetPosition(-250);
+                armMotor.setTargetPosition(-350);
                 break;
             case STONE_PICKUP:
-                armMotor.setTargetPosition(-1300);
+                armMotor.setTargetPosition(-1400);
                 break;
         }
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);

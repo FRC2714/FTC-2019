@@ -43,7 +43,7 @@ public class VisionPipeline extends OpenCvPipeline{
 
     // THESE NEED TO BE TUNED BASED ON YOUR DISTANCE FROM THE BLOCKS
     private final double minContourArea = 300.0;
-    private final double minContourPerimeter = 1000.0;
+    private final double minContourPerimeter = 600.0;
     private final double minContourWidth = 300.0;
     private final double minContourHeight = 0.0;
 
