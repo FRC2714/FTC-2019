@@ -81,10 +81,10 @@ public class DriverControlLinearOp extends LinearOpMode {
 
 		if (dpad_down) {
 			arm.setServo(ServoPosition.RELAXED);
-			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
+			arm.goToPosition(ArmPosition.STONE_PICKUP, 1, drivetrain, gamepad1);
 			arm.setServo(ServoPosition.PRESSURE_STONE);
 			arm.setIntakeMotor(-1, 0.5);
-			arm.goToPosition(ArmPosition.SAFE_HOLD, 1);
+			arm.goToPosition(ArmPosition.SAFE_HOLD, 1, drivetrain, gamepad1);
 		}
 
 //		if (y) {
@@ -98,11 +98,11 @@ public class DriverControlLinearOp extends LinearOpMode {
 
 
 		if (a)
-			arm.goToPosition(ArmPosition.STONE_PICKUP, 1);
+			arm.goToPosition(ArmPosition.STONE_PICKUP, 1, drivetrain, gamepad1);
 		if (b)
-			arm.goToPosition(ArmPosition.SAFE_HOLD, 1);
+			arm.goToPosition(ArmPosition.SAFE_HOLD, 1, drivetrain, gamepad1);
 		if(x)
-		    arm.goToPosition(ArmPosition.HIGH_HOLD, 1);
+		    arm.goToPosition(ArmPosition.HIGH_HOLD, 1, drivetrain, gamepad1);
 
 //        if(a)
 //            drivetrain.setLinearMotion(-0.7,-0.7,-800,0,true);
@@ -119,12 +119,16 @@ public class DriverControlLinearOp extends LinearOpMode {
 		else
 			arm.setIntakeMotor(0);
 
-		if(lb)
+		if(lb) {
+			tele.addData("IM TIGHTNED", 0);
 			arm.setServo(ServoPosition.PRESSURE_STONE);
-		else if(Math.abs(lTrigger) > 0.2)
+		}
+		else if(Math.abs(lTrigger) > 0.4) {
 			arm.setServo(ServoPosition.RELAXED);
+			tele.addData("IM RELAXED", 0);
+		}
 
-		if(!(arm.getArmPotentiometerPosition() > 0.67)) {
+		if(!(arm.getArmPotentiometerPosition() > 1)) {
 			if (manualArmInput > 0.07)
 				arm.setArmMotor(-1);
 			else if (manualArmInput < -0.07)
@@ -143,6 +147,9 @@ public class DriverControlLinearOp extends LinearOpMode {
 				arm.setArmMotor(0);
 		}
 
+//		if(arm.isHoldingStone)
+//			arm.setMotorAdditive(0.1);
+
 		arm.update();
 
 		telemetry.addData("Arm Motor Encoder Position", arm.getArmMotorEncoderPosition());
@@ -157,8 +164,17 @@ public class DriverControlLinearOp extends LinearOpMode {
 	}
 
 	public void setupArm(){
-		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 0.86){
+		while (resetArmAtStartup && arm.getArmPotentiometerPosition() < 1){
 			arm.setArmMotor(0.4);
+			double forwardInput = -gamepad1.left_stick_x,
+					strafeInput = -gamepad1.left_stick_y,
+					turnInput = -gamepad1.right_stick_x;
+			if (forwardInput * forwardInput + strafeInput * strafeInput > DEADZONE || Math.abs(turnInput) > DEADZONE) {
+				drivetrain.setDirectionVector(forwardInput, strafeInput, turnInput);
+			} else {
+				drivetrain.setDirectionVector(0, 0);
+			}
+			drivetrain.updatePosition();
 		}
 		if (resetArmAtStartup) {
 			arm.setArmMotor(0);
@@ -166,5 +182,6 @@ public class DriverControlLinearOp extends LinearOpMode {
 		}
 		resetArmAtStartup = false;
 	}
+
 
 }

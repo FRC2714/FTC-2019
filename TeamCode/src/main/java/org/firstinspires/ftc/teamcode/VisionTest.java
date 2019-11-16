@@ -179,10 +179,10 @@ public class VisionTest extends LinearOpMode {
                 if(runOnce) {
                     drivetrain.setLinearMotion(0.5, 0.5, 770, 0, false);
                     arm.setServo(Arm.ServoPosition.RELAXED);
-                    arm.goToPosition(Arm.ArmPosition.STONE_PICKUP, 1);
+                    arm.goToPosition(Arm.ArmPosition.STONE_PICKUP, 1,drivetrain, gamepad1);
                     arm.setServo(Arm.ServoPosition.PRESSURE_STONE);
                     arm.setIntakeMotor(-1, 0.6);
-                    arm.goToPosition(Arm.ArmPosition.SAFE_HOLD, 1);
+                    arm.goToPosition(Arm.ArmPosition.SAFE_HOLD, 1,drivetrain, gamepad1);
                     drivetrain.resetEncoders();
                     drivetrain.setEncoderState(true);
                     drivetrain.setLinearMotion(-0.5, -0.5, -400, 0, false);

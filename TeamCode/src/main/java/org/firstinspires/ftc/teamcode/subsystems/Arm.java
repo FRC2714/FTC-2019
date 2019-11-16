@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm {
 
@@ -19,6 +22,8 @@ public class Arm {
     private AnalogInput arm_potentiometer;
 
     private boolean servoState, firstTime;
+
+    public boolean isHoldingStone = false;
 
     public static Arm getInstance(HardwareMap hm) {
         if (arm == null) arm = new Arm(hm);
@@ -52,12 +57,12 @@ public class Arm {
         ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         intakeMotor.setPower(speed);
         while (timer.seconds() < time){
-            
+
         }
         intakeMotor.setPower(0);
     }
 
-    public void goToPosition(ArmPosition position, double power) {
+    public void goToPosition(ArmPosition position, double power, Drivetrain drivetrain, Gamepad gamepad1) {
         isArmMotionProfiling = true;
         switch (position){
             case STARTING:
@@ -70,13 +75,21 @@ public class Arm {
                 armMotor.setTargetPosition(-350);
                 break;
             case STONE_PICKUP:
-                armMotor.setTargetPosition(-1400);
+                armMotor.setTargetPosition(-1470);
                 break;
         }
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(power);
         while (!(Math.abs(armMotor.getTargetPosition() - armMotor.getCurrentPosition()) < 50)){
-
+            double forwardInput = -gamepad1.left_stick_x,
+                    strafeInput = -gamepad1.left_stick_y,
+                    turnInput = -gamepad1.right_stick_x;
+            if (forwardInput * forwardInput + strafeInput * strafeInput > 0.01 || Math.abs(turnInput) > 0.01) {
+                drivetrain.setDirectionVector(forwardInput, strafeInput, turnInput);
+            } else {
+                drivetrain.setDirectionVector(0, 0);
+            }
+            drivetrain.updatePosition();
         }
 
     }
@@ -84,10 +97,12 @@ public class Arm {
     public void setServo(ServoPosition servoPosition){
         switch (servoPosition){
             case RELAXED:
-                intakeServo.setPosition(1);
+                intakeServo.setPosition(0.7);
+                isHoldingStone = false;
                 break;
             case PRESSURE_STONE:
-                intakeServo.setPosition(0.68);
+                isHoldingStone = true;
+                intakeServo.setPosition(0.4);
                 break;
         }
     }
@@ -124,6 +139,11 @@ public class Arm {
             }
     }
 
+
+    public void setMotorAdditive(double amount){
+        intakeMotor.setPower(armMotor.getPower() - amount);
+    }
+    
     public enum ArmPosition {
         STARTING,
         SAFE_HOLD,
